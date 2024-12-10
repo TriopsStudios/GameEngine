@@ -1,5 +1,7 @@
 #include "GameEngine.h"
+#include "levelHandler.h"
 #include <filesystem> 
+#include <fstream>
 #include <vector> 
 namespace fs = std::filesystem;
 
@@ -14,6 +16,7 @@ namespace fs = std::filesystem;
 #define MAXIMOFILA 4
 
 GameEngine handleLevel;
+levelHandler* levelH;
 SDL_Renderer* render;
 SDL_Renderer* renderPaleta;
 SDL_Window* mainV;
@@ -87,9 +90,19 @@ for(int i=0; i<XROW*YROW;i++){
         a++;
     }
     }
+    
+/*
+ * objetosPaleta[i].x0 = (ANCHOPALETA/MAXIMOFILA)*separador; 
+    objetosPaleta[i].x1 = objetosPaleta[i].x0 + (ANCHOPALETA/MAXIMOFILA);
+    objetosPaleta[i].w = ANCHOPALETA/MAXIMOFILA;
+    objetosPaleta[i].h = ALTOPALETA;
+    objetosPaleta[i].y0 = 0 + separadorVertical;//(ALTO/YROW)*a;
+    objetosPaleta[i].y1 =  objetosPaleta[i].y0 + (ALTOPALETA);//objetos[i][a].y0 + (ALTO/YROW);
+    objetosPaleta[i].textura = texturas[i];*/
  
     bool loop = true;
-    
+     DEBUG "y0: " <<objetosPaleta[0].y0<<END;
+    DEBUG "y1: " <<objetosPaleta[0].y1<<END;
    while(loop==true){
        while (SDL_PollEvent(&evento)) { 
         if (evento.type == SDL_QUIT) { 
@@ -99,24 +112,41 @@ for(int i=0; i<XROW*YROW;i++){
         if(evento.type == SDL_KEYDOWN){
             switch(evento.key.keysym.sym){
                 case SDLK_w:
+                DEBUG "PULSO W"<< END;
+                 //DEBUG objetosPaleta[tamañoVectorG-1].y0 <<END;
+                
                 for(int i=0; i<tamañoVectorG;i++){
-                    objetosPaleta[i].y0 = objetosPaleta[i].y0 - 10;
-                    //handleLevel.LimpiarRender(renderPaleta);
-                     //handleLevel.MostrarTextura(renderPaleta, objetosPaleta[i].textura, objetosPaleta[i].x0, objetosPaleta[i].y0, objetosPaleta[i].w, objetosPaleta[i].h); 
-                     
+                    if(objetosPaleta[tamañoVectorG-1].y0 > 0){
+                    
+                        objetosPaleta[i].y0 = objetosPaleta[i].y0 - 10;
+                        objetosPaleta[i].y1 =  objetosPaleta[i].y0 + (ALTOPALETA);
+                    }
                     
                 }
-                  break;
+                 
+                 DEBUG "y0: " <<objetosPaleta[0].y0<<END;
+                  DEBUG "y1: " <<objetosPaleta[0].y1<<END;
+                  
+                DEBUG "ALTOPALETA: "<<ALTOPALETA<<END;
+                    break; 
+                
+                  
                   case SDLK_s:
-                for(int i=0; i<tamañoVectorG;i++){
-                    objetosPaleta[i].y0 = objetosPaleta[i].y0 + 10;
-                    //handleLevel.LimpiarRender(renderPaleta);
-                     //handleLevel.MostrarTextura(renderPaleta, objetosPaleta[i].textura, objetosPaleta[i].x0, objetosPaleta[i].y0, objetosPaleta[i].w, objetosPaleta[i].h); 
-                     
-                    
-                }
+                  DEBUG "PULSO S"<< END;
+                  if(objetosPaleta[0].y1 < ALTOPALETA){
+                      for(int i=0; i<tamañoVectorG;i++){
+                        objetosPaleta[i].y0 = objetosPaleta[i].y0 + 10;
+                        objetosPaleta[i].y1 =  objetosPaleta[i].y0 + (ALTOPALETA);
+                      DEBUG "y1: " <<objetosPaleta[0].y1<<" / ALTOPALETA: "<<ALTOPALETA<<END;
+                      }
+                      
+                  }
+                
                   break;
             }
+            case N:
+            levelH.Guardar(objetosEditor, "nivel1",tamañoVectorG);
+            break;
         }
             
        if (evento.type == SDL_MOUSEBUTTONDOWN) {
@@ -129,17 +159,11 @@ for(int i=0; i<XROW*YROW;i++){
                  for(int i=0;i<tamañoVectorG;i++){
                     
                         if(xb>=objetosPaleta[i].x0 && xb<=objetosPaleta[i].x1 && yb>=objetosPaleta[i].y0 && yb<=objetosPaleta[i].y1){
-                            DEBUG
-                            DEBUG
-                            DEBUG
-                            DEBUG
+                          int iteracionSeleccionada = i;
                            for(int i=0; i<tamañoVectorG;i++){
                             
-                                if(objetosPaleta[i].textura == texturas[i]){
-                                    texturaSeleccionada = i;
-                                        DEBUG  objetosPaleta[i].textura<< " = ";
-                                        DEBUG texturas[i] << END;
-                                        
+                                if(objetosPaleta[iteracionSeleccionada].textura == texturas[i]){
+                                    texturaSeleccionada = i;    
                                 break;
                                 }
                            }
@@ -147,66 +171,47 @@ for(int i=0; i<XROW*YROW;i++){
                  }
                 }
                                         
-                if(evento.button.windowID == SDL_GetWindowID(mainV)){
-                DEBUG "MAINV" << END;
-                }
+                
             }
-                
-                /* DEBUG "ESTOY AQUI";
-                if(evento.button.windowID == SDL_GetWindowID(paleta)){
-                int xb = evento.button.x; 
-                int yb = evento.button.y;
-                DEBUG "xb" << xb << END;
-                DEBUG "yb" << yb << END;
-                
-                for(int i=0;i<tamañoVectorG;i++){
-                    
-                        if(xb>=objetosPaleta[i].x0 && xb<=objetosPaleta[i].x1 && yb>=objetosPaleta[i].y0 && yb<=objetosPaleta[i].y1){
-                            
-                           for(int i=0; i<tamañoVectorG;i++){
-                                DEBUG  objetosPaleta[i].textura<< " = ";
-                                DEBUG texturas[i] << END;
-                                if(objetosPaleta[i].textura == texturas[i]){
-                                        texturaSeleccionada = i;
-                                        break;
-                                }
-                                
-                            }
-                            
-                        
-                    }
-                
-                }
-            
-                if(evento.button.windowID == SDL_GetWindowID(mainV)){
-                     DEBUG "ESTOY AQUI";
-                    int xb = evento.button.x; 
-                int yb = evento.button.y;
-                    for(int i=0;i<tamañoVectorG;i++){
-                    if(xb>=objetosEditor[i].x0 && xb<=objetosEditor[i].x1 && yb>=objetosEditor[i].y0 && yb<=objetosEditor[i].y1){
-                       
-                            objetosEditor[i].textura = texturasE[texturaSeleccionada];
-                    }
-                    }
-                        
-                    }
-                }
-            }*/
             
             
         }
+        
+        
+        if (evento.type == SDL_MOUSEMOTION) {
+            if(evento.button.button == SDL_BUTTON_LEFT){
+            if(evento.button.windowID == SDL_GetWindowID(mainV)){ //---
+                
+                int xb = evento.button.x; 
+                int yb = evento.button.y;
+                    for(int i=0;i<XROW*YROW;i++){
+                        if(xb>=objetosEditor[i].x0 && xb<=objetosEditor[i].x1 && yb>=objetosEditor[i].y0 && yb<=objetosEditor[i].y1){
+                       //debugger
+                      /* DEBUG "x0: "<<objetosEditor[i].x0<<END;
+                       DEBUG "x1: "<<objetosEditor[i].x1<<END;
+                       DEBUG "y0: "<<objetosEditor[i].y0<<END;
+                       DEBUG "y1: "<<objetosEditor[i].y1<<END;*/
+                            objetosEditor[i].textura = texturasE[texturaSeleccionada];
+                        }
+                    }
+
+                }//---
+            }
+        }
+            
+        
     }
     handleLevel.LimpiarRender(renderPaleta);
     handleLevel.LimpiarRender(render);
     MostrarTexturasPaleta();
     MostrarTexturasEditor();
-  
+    DibujarGrilla();
        handleLevel.RefrescarRender(renderPaleta);
        handleLevel.RefrescarRender(render);
                   
-       handleLevel.RefrescarRender(render, DibujarGrilla);
+      
        
-    
+   
        
        
    }
@@ -276,7 +281,7 @@ int CargarTexturasEditor(){ //carga todas las texturas de la carpeta imagen y de
      
      int separador = 0;
      int separadorVertical = 0;
-     int a = 1;
+     
      int finalSeparador = (ANCHOPALETA/MAXIMOFILA) * MAXIMOFILA- (ANCHOPALETA/MAXIMOFILA);
      for(int i=0; i<tamañoVector;i++){
          
@@ -291,8 +296,8 @@ int CargarTexturasEditor(){ //carga todas las texturas de la carpeta imagen y de
     if(objetosPaleta[i].x0==finalSeparador){
       
         separador = 0;
-        separadorVertical = separadorVertical + (ALTOPALETA)*a;
-        a++;
+        separadorVertical = separadorVertical + (ALTOPALETA);
+        
     }
     handleLevel.MostrarTextura(renderPaleta, objetosPaleta[i].textura, objetosPaleta[i].x0, objetosPaleta[i].y0, objetosPaleta[i].w, objetosPaleta[i].h); 
 	
